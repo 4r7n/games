@@ -9,6 +9,12 @@ except:
 
 AI = False
 
+
+#       /\    __         __
+#      /__\  |    |  |  |  |
+#     /    \ |    |__|  |  |
+
+
 root=Tk()
 root.geometry("460x720")
 root.title("Aяυи")
@@ -131,6 +137,7 @@ hand = [random.choice(blckt), random.choice(blckt), random.choice(blckt)]
 hc = [random.choice(clrz), random.choice(clrz), random.choice(clrz)]
 ndx = 0
 cqx = [True, True, True]
+g_end = False
 
 
 def valid(x, y):
@@ -150,6 +157,35 @@ def valid(x, y):
         return False
 
     return vl
+
+
+def check_end():
+    global blocks, hand, cqx
+
+    for q, ir in enumerate(hand):
+
+        if not cqx[q] == False:
+
+            for x in range(8):
+                for y in range(8):
+
+                    construct = ir(x, y)
+                    insp = [item for item in list(set(sum(construct, []))) if (item<0 or item>7)]
+
+                    if insp==[]:
+                        vl = True
+
+                        for item in construct:
+                            if not blocks[item[0]][item[1]]==None:
+                                vl = False
+
+                    else:
+                        vl = False
+
+                    if vl==True:
+                        return False
+    return True
+
 
 
 def place(state, x, y):
@@ -212,7 +248,7 @@ def hover_lev(state, x, y):
 
 
 def gamereg():
-    global blocks, ndx, hc, hand, scalr, last, score, high, sincelast, cqx
+    global blocks, ndx, hc, hand, scalr, last, score, high, sincelast, cqx, g_end
 
     hand[ndx] = lambda x, y: []
     cqx[ndx] = False
@@ -267,6 +303,8 @@ def gamereg():
         for i,row in enumerate(blocks):
             blocks[i][item] = None
 
+    g_end = check_end()
+    glight(g_end)
 
 
     anim_optn()
@@ -427,7 +465,7 @@ def anim_blck():
                 cells[y][x].cls(ix)
 
 def restart():
-    global blocks, score, scalr, last, sincelast, cqx, hc, ndx, hand
+    global blocks, score, scalr, last, sincelast, cqx, hc, ndx, hand, g_end
 
     blocks = [[None for i in range(8)] for i in range(8)]
     score = 0
@@ -438,6 +476,8 @@ def restart():
     hc = [random.choice(clrz), random.choice(clrz), random.choice(clrz)]
     ndx = 0
     cqx = [True, True, True]
+    g_end = False
+    glight(g_end)
 
     if AI==True:
         mapgr = [[0 if i==None else 1 for i in item] for item in blocks]
@@ -461,6 +501,19 @@ rb.bind("<Enter>", lambda event: rlight(False))
 rb.bind("<Leave>", lambda event: rlight("haha"))
 
 rb.place(x=150, y=670, height = 30, width=160)
+
+gxe = Button(root, bg="dark olive green", state = "normal" , text="END?")
+gxe["font"] = tkFont.Font(family='Helvetica', size=int(13))
+
+gxe.place(x=386, y=684, height = 25, width=60)
+
+def glight(m):
+    global gxe
+
+    if m==False:
+        gxe['bg'] = "dark olive green"
+    else:
+        gxe['bg'] = "lawn green"
 
 logo = [
 Graphic(17,706), Graphic(18,702), Graphic(19,698), Graphic(20,694), Graphic(21,690),
